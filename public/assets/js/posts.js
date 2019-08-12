@@ -1,11 +1,56 @@
-// 获取文章列表
-// - 在页面一加载的时候向服务器端发送请求索要文章列表数据
+// 获取到所有的分类 
+var c = $('#category').val();
+var s = $('#s').val();
+
+// 发送ajax将服务器给我们数据渲染到模板上面 
+function render(c = "all", s = "all", page = 1) {
+    $.ajax({
+        type: 'get',
+        url: '/posts',
+        data: {
+            page: page || 1, // 分页的页码
+            category: c, // 分类名称
+            state: s // 状态 
+        },
+        success: function (res) {
+            var html = template('pTpl', res);
+            $('tbody').html(html);
+
+            var page = template('pageTpl', res);
+            $('.pagination').html(page);
+        }
+    });
+}
+// 要显示所有的分类以及所有的状态 
+render();
+
+function formateDate(date) {
+    // 将日期时间字符串转换成日期对象
+    date = new Date(date);
+    return date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, 0) + '-' + date.getDate()
+}
+
+// 分页
+function pageChange(page) {
+    // 
+    render(c, s, page);
+}
+// 取出所有的分类
+// 向服务器端发送请求 获取文章分类数据
 $.ajax({
-    url:'/posts',
-    type:'get',
-    success:function(){
-        
+    url: '/categories',
+    type: 'get',
+    success: function (response) {
+        var html = template('categoryTpl', { data: response });
+        $('#category').append(html);
     }
 })
-// - 通过模板引擎将文字列表数据和HTML进行拼接，拼接完成以后将内容显示在页面
-// - 根据分页数据实现列表数据分页功能
+
+// 筛选 
+$('#cSearch').on('click', function () {
+    // 获取到分类id与状态 
+    c = $('#category').val();
+    s = $('#s').val();
+    render(c, s);
+});
+

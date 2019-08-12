@@ -32,26 +32,8 @@ $('#feature').on('change', function () {
     })
 })
 
-// 点击保存按钮添加文章
-// $('#pAdd').on('click', function () {
-//     $.ajax({
-//         type:'post',
-//         url:'/posts',
-//         data:$('#pForm').serialize(),
-//         success:function(res){
-//             location.href='/admin/posts.html'
-//         },
-//         error:function(err){
-//             console.log(err);
-            
-//         }
-//     })
-//     // render();
-    
-// })
-
 $('#pAdd').on('click', function () {
-    console.log($('#pForm').serialize());
+    // console.log($('#pForm').serialize());
     // return;
     $.ajax({
         type: 'post',
@@ -60,7 +42,7 @@ $('#pAdd').on('click', function () {
         success: function (res) {
             // 需要跳转到展示文章的列表页
             console.log(111);
-            
+
             location.href = "/admin/posts.html";
         },
         error: function (err) {
@@ -72,5 +54,61 @@ $('#pAdd').on('click', function () {
 })
 
 
-//获取到管理员在表单中输入的内容
-//向服务器端发送添加文章的请求，实现文章添加功能，文章添加成功以后要跳转到文章列表页面
+
+// 定义一个函数 用来获取浏览器地址中的id参数
+var id = getUrlParams('id');
+console.log(id);
+
+// 修改功能
+if (id != -1) {
+    // 发送ajax 向服务器发送请求这边文章的相关信息
+    $.ajax({
+        type: 'get',
+        url: '/posts/' + id,
+        success: function (res) {
+            console.log(res);
+            // 获取标签
+            $('#title').val(res.title);
+            // 获取文章内容
+            $('#content').val(res.content);
+            // 获取文章提交时间 并判断当提交了时间时 就截取时间的字符串 获得时间的规范显示
+            $('#created').val(res.createAt && res.createAt.substr(0, 16));
+            // 获取category下所有的option 分类
+            var coption = $('#category > option');
+            // 遍历这个分类
+            coption.each(function (index, item) {
+                // 需要将item对象转换为jq对象
+                if ($(item).val() == res.category) {
+                    $(item).prop('selected', true);
+                }
+            });
+            // 获取文章的发布状态
+            var soption = $('#status > option');
+            // 遍历这个状态的下拉框
+            soption.each(function (index, item) {
+                // 需要将item对象转换为jq对象
+                if ($(item).val() == res.state) {
+                    $(item).prop('selected', true);
+                }
+            });
+            // 获取上传的图片
+            $("#feature").val(res.thumbnail);
+            $('#pImg').show().prop("src",res.thumbnail);
+            
+        }
+    })
+}
+
+// 从浏览器的地址中获取id
+function getUrlParams(name) {
+    var par = location.search.substr(1).split('&');
+    // 循环数据
+    for (var i = 0; i < par.length; i++) {
+        var tem = par[i].split('=');
+        if (tem[0] == name) {
+            return tem[1];
+        } else {
+            return -1;
+        }
+    }
+}
