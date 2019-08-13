@@ -57,7 +57,6 @@ $('#pAdd').on('click', function () {
 
 // 定义一个函数 用来获取浏览器地址中的id参数
 var id = getUrlParams('id');
-console.log(id);
 
 // 修改功能
 if (id != -1) {
@@ -66,7 +65,7 @@ if (id != -1) {
         type: 'get',
         url: '/posts/' + id,
         success: function (res) {
-            console.log(res);
+            // console.log(res);
             // 获取标签
             $('#title').val(res.title);
             // 获取文章内容
